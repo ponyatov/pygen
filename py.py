@@ -14,15 +14,21 @@ class AST:
 		for j in self.nest: S += j.dump(depth+1)
 		return S
 	def head(self): return '<%s:%s>'%(self.tag,self.val)
+	# operators
+	def __div__(self,o): self.nest.append(o) ; return self
 	# codegen
 	def cpp(self):
-		C = '// %s\nint main(){}\n'%self.head()
+		C = '// %s\n\n'%self.head()
 		for j in self.nest: C += j.cpp()
 		return C
 
 class Program(AST): pass
 
-prog = Program('Hello')
+class Function(AST):
+	def cpp(self): return 'int %s(){}\n'%self.val
+
+prog = Program('Hello') \
+/ Function('main')
 
 print >>log,prog
 print >>cpp,prog.cpp()
